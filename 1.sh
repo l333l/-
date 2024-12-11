@@ -54,7 +54,7 @@ install_docker_from_official() {
     # 安装必要工具
     sudo apt-get install -y ca-certificates curl gnupg
     # 添加 Docker GPG 密钥
-    sudo mkdir -p /etc/apt/keyrings
+    sudo install -m 0755 -d /etc/apt/keyrings
     sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
     sudo chmod a+r /etc/apt/keyrings/docker.asc
     # 添加 Docker 软件源
