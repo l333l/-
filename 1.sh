@@ -156,6 +156,13 @@ remove_docker() {
     echo -e "\nDocker 和 Docker Compose 删除完成！\n"
 }
 
+yijian(){
+    update_system
+    echo "更新时间"
+    set_shanghai_time
+    echo "完成"
+}
+
 # 主菜单
 while true; do
     show_current_status
