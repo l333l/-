@@ -45,36 +45,30 @@ show_current_status() {
 
 # 安装 Docker 从官方源
 install_docker_from_official() {
-    echo -e "\n正在安装 Docker 和 Docker Compose... 请耐心等待\n"
-
-    # 移除旧版本
-    for pkg in docker.io docker-doc docker-compose podman-docker containerd runc; do sudo apt-get remove $pkg; done
-    # 更新软件包列表
-    sudo apt-get update
-    # 安装必要工具
-    sudo apt-get install -y ca-certificates curl gnupg
-    # 添加 Docker GPG 密钥
-    sudo install -m 0755 -d /etc/apt/keyrings
-    sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
-    sudo chmod a+r /etc/apt/keyrings/docker.asc
-    # 添加 Docker 软件源
-    sudo tee /etc/apt/sources.list.d/docker.list >/dev/null <<EOF
-deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian $(. /etc/os-release && echo "$VERSION_CODENAME") stable
-EOF
-    # 更新软件包列表
-    sudo apt-get update
-    # 安装 Docker Engine 和 Docker Compose
-    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-    # 验证安装
-    echo "-----------------------------------"
-    echo "-----------------------------------"
-    sudo docker version
-    echo "-----------------------------------"
-    sudo docker compose version
-    echo "-----------------------------------"
-    echo "-----------------------------------"
-    #sudo docker run hello-world
-    echo -e "\nDocker 安装完成！\n"
+    echo "正在通过 Docker 官网安装 Docker 和 Docker Compose..."
+    {
+        # 移除旧版本
+        apt-get remove -y docker docker-engine docker.io containerd runc &&
+        # 更新软件包清单
+        apt-get update &&
+        # 安装必要的依赖
+        apt-get install -y ca-certificates curl gnupg &&
+        # 添加 Docker 的 GPG 密钥和官方源
+        install -m 0755 -d /etc/apt/keyrings &&
+        curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg &&
+        chmod a+r /etc/apt/keyrings/docker.gpg &&
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null &&
+        # 更新源并安装 Docker 软件包
+        apt-get update &&
+        apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin &&
+        # 安装 Docker Compose 插件
+        apt-get install -y docker-compose-plugin
+    } || {
+        log_error "安装 Docker 和 Docker Compose" "$(2>&1)"
+        echo "安装失败，请检查错误日志：$ERROR_LOG"
+        return
+    }
+    echo "Docker 和 Docker Compose 安装成功！"
 }
 
 # 修改系统时区为上海时间
