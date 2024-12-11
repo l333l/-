@@ -173,6 +173,7 @@ while true; do
     echo "3: 更新 Docker 和 Docker Compose"
     echo "4: 安装 Docker 和 Docker Compose"
     echo "5: 删除 Docker 和 Docker Compose"
+    echo "6: 一键"
     echo "-----------------------------------"
     read -p "请选择要执行的任务 (1-5，输入q退出): " CHOICE
     case $CHOICE in
@@ -190,7 +191,10 @@ while true; do
         ;;
     5)
         remove_docker
-        ;;        
+        ;;
+    6)
+        yijian
+        ;;
     q)
         echo "退出脚本。"
         exit 0
