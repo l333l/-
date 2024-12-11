@@ -66,8 +66,13 @@ EOF
     # 安装 Docker Engine 和 Docker Compose
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
     # 验证安装
+    echo "-----------------------------------"
+    echo "-----------------------------------"
     sudo docker version
+    echo "-----------------------------------"
     sudo docker compose version
+    echo "-----------------------------------"
+    echo "-----------------------------------"
     #sudo docker run hello-world
     echo -e "\nDocker 安装完成！\n"
 }
