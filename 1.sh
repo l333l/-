@@ -148,7 +148,7 @@ remove_docker() {
     fi
 
     # 清理残留的包和依赖
-    if ! rm -rf /etc/docker && rm -rf /var/lib/docker && rm -rf /var/lib/containerd; then
+    if ! rm -rf /etc/docker && rm -rf /var/lib/docker && rm -rf /var/lib/containerd && rm -rf /etc/apt/keyrings/docker.asc; then
         log_error "清理残留的包和依赖" "$(2>&1)"
         return 1
     fi    
