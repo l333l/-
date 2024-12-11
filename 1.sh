@@ -21,7 +21,7 @@ check_docker_status() {
         DOCKER_STATUS="✘ Docker          未安装"
     fi
 
-    if docker compose --version &> /dev/null 2>&1; then
+    if docker compose version &>/dev/null; then
         COMPOSE_VERSION=$(docker compose version | awk '{print $4}' | sed 's/,//')
         COMPOSE_STATUS="✔ Docker Compose  已安装 ($COMPOSE_VERSION)"
     else
@@ -64,7 +64,7 @@ install_docker_from_official() {
         # 安装 Docker Compose 插件
         apt-get install -y docker-compose-plugin
     } || {
-        log_error "安装 Docker 和 Docker Compose" "$(2>&1)"
+        log_error "安装 Docker 和 Docker Compose" "$?"
         echo "安装失败，请检查错误日志：$ERROR_LOG"
         return
     }
@@ -77,7 +77,7 @@ set_shanghai_time() {
     {
         timedatectl set-timezone Asia/Shanghai
     } || {
-        log_error "修改系统时区" "$(2>&1)"
+        log_error "修改系统时区" "$?"
         echo "修改时区失败，请检查错误日志：$ERROR_LOG"
         return
     }
@@ -100,7 +100,7 @@ update_system() {
     {
         apt-get update && apt-get upgrade -y
     } || {
-        log_error "更新系统软件" "$(2>&1)"
+        log_error "更新系统软件" "$?"
         echo "系统更新失败，请检查错误日志：$ERROR_LOG"
         return
     }
@@ -110,7 +110,7 @@ update_system() {
             echo "安装 $pkg..."
             if ! apt-get install -y "$pkg"; then
                 FAILED_ITEMS+=("$pkg")
-                log_error "安装 $pkg" "$(2>&1)"
+                log_error "安装 $pkg" "$?"
             fi
         else
             echo "✔ $pkg          已安装"
@@ -133,40 +133,37 @@ update_system() {
 # 删除 Docker 和 Docker Compose
 remove_docker() {
     echo -e "\n正在删除 Docker 和 Docker Compose... 请耐心等待\n"
-    
+
     # 移除 Docker 相关包
     if ! apt-get remove -y docker docker-engine docker.io containerd runc docker-ce docker-ce-cli docker-compose-plugin docker-buildx-plugin; then
-        log_error "删除 Docker 和 Docker Compose" "$(2>&1)"
-        return 1
-    fi
-    
-    # 清理残留的包和依赖
-    if ! apt-get autoremove -y && apt-get autoclean; then
-        log_error "清理残留的包和依赖" "$(2>&1)"
+        log_error "删除 Docker 和 Docker Compose" "$?"
         return 1
     fi
 
     # 清理残留的包和依赖
-    if ! rm -rf /etc/docker && rm -rf /var/lib/docker && rm -rf /var/lib/containerd && rm -rf /etc/apt/keyrings/docker.asc && rm -rf /etc/apt/sources.list.d/docker.list; then
-        log_error "清理残留的包和依赖" "$(2>&1)"
+    if ! apt-get autoremove -y && apt-get autoclean; then
+        log_error "清理残留的包和依赖" "$?"
+        return 1
+    fi
+
+    # 清理残留文件
+    if ! rm -rf /etc/docker /var/lib/docker /var/lib/containerd /etc/apt/keyrings/docker.asc /etc/apt/sources.list.d/docker.list; then
+        log_error "清理残留文件" "$?"
         return 1
     fi    
 
     echo -e "\nDocker 和 Docker Compose 删除完成！\n"
 }
 
-yijian(){
+yijian() {
     echo "-----------------------------------"
     update_system
-    #echo "完成"
     echo "-----------------------------------"
     echo "更新时间"
     echo "-----------------------------------"
     set_shanghai_time
     echo "-----------------------------------"
-    #echo "完成"
     install_docker_from_official
-    #echo "完成"
 }
 
 # 主菜单
@@ -179,9 +176,9 @@ while true; do
     echo "3: 更新 Docker 和 Docker Compose"
     echo "4: 安装 Docker 和 Docker Compose"
     echo "5: 删除 Docker 和 Docker Compose"
-    echo "6: 一键"
+    echo "6: 一键更新"
     echo "-----------------------------------"
-    read -p "请选择要执行的任务 (1-5，输入q退出): " CHOICE
+    read -p "请选择要执行的任务 (1-6，输入 q 退出): " CHOICE
     case $CHOICE in
     1)
         update_system
@@ -206,7 +203,7 @@ while true; do
         exit 0
         ;;
     *)
-        echo "无效输入，请输入 1-5 的数字。"
+        echo "无效输入，请输入 1-6 的数字。"
         ;;
     esac
 done
