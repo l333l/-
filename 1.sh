@@ -157,10 +157,17 @@ remove_docker() {
 }
 
 yijian(){
+    echo "-----------------------------------"
     update_system
+    #echo "完成"
+    echo "-----------------------------------"
     echo "更新时间"
+    echo "-----------------------------------"
     set_shanghai_time
-    echo "完成"
+    echo "-----------------------------------"
+    #echo "完成"
+    install_docker_from_official
+    #echo "完成"
 }
 
 # 主菜单
